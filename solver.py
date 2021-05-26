@@ -11,7 +11,28 @@ from pysmt.shortcuts import Symbol, And, Or, Solver, Iff, Implies
 
 # d = dimension
 # n = # of cliques
+# O = set of items
+# S^i = set of all infeasible sets in dim i
 
+def var_string(*vargs):
+	"""Returns string representation of a variable"""
+	vargs = [str(i) for i in vargs]
+	if vargs[0] == "c":
+		if len(vargs) == 4:
+			return "_".join(vargs)
+	elif vargs[0] == "e":
+		if len(vargs) == 4:
+			return "_".join(vargs)
+	elif vargs[0] == "p":
+		if len(vargs) == 5:
+			return "_".join(vargs)
+	elif vargs[0] == "u":
+		if len(vargs) == 3:
+			return "_".join(vargs)
+	else:
+		print(f"Error unknown var base: {vargs[0]}")
+		return
+	print(f"Incorrect # of args: {len(vargs)} for base {vargs[0]}")
 
 # Set 1: All objects are packed
 # for x in O, 1 <= i <= d

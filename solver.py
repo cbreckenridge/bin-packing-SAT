@@ -14,6 +14,16 @@ from pysmt.shortcuts import Symbol, And, Or, Solver, Iff, Implies
 # O = set of items
 # S^i = set of all infeasible sets in dim i
 
+# Simple example for testing
+x1 = (1,2)
+x2 = (3,1)
+x3 = (1,1)
+O = (x1,x2,x3)
+n = len(O)
+d = len(x1)
+
+
+
 def var_string(*vargs):
 	"""Returns string representation of a variable"""
 	vargs = [str(i) for i in vargs]
@@ -38,6 +48,13 @@ def var_string(*vargs):
 # for x in O, 1 <= i <= d
 # c_i_x_1 or ... or c_i_x_n
 # TODO
+set_1 = []
+for x_i in range(1,n+1):
+	for i in range(1,d+1):
+		set_1.append(Or([Symbol(var_string("c",i,x_i,j)) for j in range(1,n+1)]))
+
+set_1 = And(set_1)
+print(set_1)
 
 # Set 2: Consecutive linear ordering
 # for x in O, 1 <= i <= d, 1 <= a < b-1 < n

@@ -1,7 +1,7 @@
 # Main file for getting satisfiable assignment of bin packing instance
 # Christine Breckenridge
 
-from pysmt.shortcuts import Symbol, And, Or, Solver, Iff, Implies
+from pysmt.shortcuts import Symbol, And, Or, Solver, Iff, Implies, Not
 
 # Variables:
 # e_i_x_y = true if edge x,y in G_i
@@ -84,6 +84,14 @@ print(set_2)
 # for x,y in O
 # !e_1_x_y or ... or !e_d_x_y
 # TODO
+set_3 = []
+for x_i in range(1,n+1):
+	for y_i in range(1,n+1):
+		if y_i != x_i:
+			for i in range(1,d+1):
+				set_3.append(Not(var_symbol("e",i,x_i,y_i)))
+set_3 = Or(set_3)
+print(set_3)
 
 # Set 4: Stable set feasibility
 # for 1 <= i <= d, N in S^i

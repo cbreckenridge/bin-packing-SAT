@@ -13,12 +13,14 @@ from pysmt.shortcuts import Symbol, And, Or, Solver, Iff, Implies, Not
 # n = # of cliques
 # O = set of items
 # S^i = set of all infeasible sets in dim i
+# C = container
 
 # Simple example for testing
 x1 = (1,2)
 x2 = (3,1)
-x3 = (1,1)
+x3 = (2,1)
 O = (x1,x2,x3)
+C = (4,6)
 n = len(O)
 d = len(x1)
 
@@ -83,7 +85,7 @@ print(set_2)
 # Set 3: No-overlap constraint
 # for x,y in O
 # !e_1_x_y or ... or !e_d_x_y
-# TODO
+
 set_3 = []
 for x_i in range(1,n+1):
 	for y_i in range(1,n+1):
@@ -96,8 +98,25 @@ print(set_3)
 # Set 4: Stable set feasibility
 # for 1 <= i <= d, N in S^i
 # OR_(for all x,y in N) e_i_x_y
-# TODO
 # Must generate all infeasible sets
+S = []
+for i in range(1,d+1):
+	S.append([])
+	for x_i,x in enumerate(O):
+		for y_i,y in enumerate(O):
+			if y_i != x_i and x[i-1] + y[i-1] > C[i-1]:
+				S[i-1].append([x_i+1,y_i+1])
+print(S)
+set_4 = []
+if S:
+	for i in range(1,d+1):
+		if S[i-1]:
+			for N in S[i-1]:
+				set_4.append(var_symbol("e",i,N[0],N[1]))
+set_4 = Or(set_4)
+print(set_4)
+
+
 
 # Set 5: No empty cliques
 # 1 <= i <= d, 1 <= a <= n

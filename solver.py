@@ -41,17 +41,27 @@ def var_string(*vargs):
 			return "_".join(vargs)
 	else:
 		print(f"Error unknown var base: {vargs[0]}")
+		raise ValueError
 		return
 	print(f"Incorrect # of args: {len(vargs)} for base {vargs[0]}")
+	raise Exception
+
+def var_symbol(*vargs):
+	"""Gets the string represntation and returns a Symbol"""
+	try:
+		string_rep = var_string(*vargs)
+		return Symbol(string_rep)
+	except Exception as e:
+		raise e
 
 # Set 1: All objects are packed
 # for x in O, 1 <= i <= d
 # c_i_x_1 or ... or c_i_x_n
-# TODO
+
 set_1 = []
 for x_i in range(1,n+1):
 	for i in range(1,d+1):
-		set_1.append(Or([Symbol(var_string("c",i,x_i,j)) for j in range(1,n+1)]))
+		set_1.append(Or([var_symbol("c",i,x_i,j) for j in range(1,n+1)]))
 
 set_1 = And(set_1)
 print(set_1)
@@ -59,7 +69,16 @@ print(set_1)
 # Set 2: Consecutive linear ordering
 # for x in O, 1 <= i <= d, 1 <= a < b-1 < n
 # (c_i_x_a and c_i_x_b) implies c_i_x_(a+1)
-# TODO
+
+set_2 = []
+for x_i in range(1,n+1):
+	for i in range(1,d+1):
+		for a in range(1,n):
+			for b in range(a+2,n+1):
+				set_2.append(Implies(And(var_symbol("c",i,x_i,a), var_symbol("c",i,x_i,b)),
+										var_symbol("c",i,x_i,a+1)))
+set_2 = And(set_2)
+print(set_2)
 
 # Set 3: No-overlap constraint
 # for x,y in O

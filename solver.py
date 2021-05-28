@@ -1,7 +1,7 @@
 # Main file for getting satisfiable assignment of bin packing instance
 # Christine Breckenridge
 
-from pysmt.shortcuts import Symbol, And, Or, Solver, Iff, Implies, Not
+from pysmt.shortcuts import Symbol, And, Or, Solver, Iff, Implies, Not, get_model
 
 # Variables:
 # e_i_x_y = true if edge x,y in G_i
@@ -155,7 +155,11 @@ set_6 = And(set_6)
 print(set_6)
 
 # Combine formulas
-# TODO
+sat_formula = And([set_1,set_2,set_3,set_4,set_5,set_6])
 
 # Get sat assignment if possible
-# TODO
+model = get_model(sat_formula)
+if model:
+  	print(model)
+else:
+  	print("No solution found")

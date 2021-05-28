@@ -134,7 +134,25 @@ print(set_5)
 # Set 6: Correlations between vars
 # for x,y in O, 1 <= a <= n, 1 <= i <= d
 # p_i_x_y_a iff (c_i_x_a and c_i_y_a) and (p_i_x_y_1 or ... or p_i_x_y_k) iff e_i_x_y
-# TODO
+
+set_6 = []
+part1 = []
+left = []
+for x_i in range(1,n+1):
+	for y_i in range(1,n+1):
+		if y_i != x_i:
+			for i in range(1,d+1):
+				for a in range(1,n+1):
+					part1.append(Iff(var_symbol("p",i,x_i,y_i,a),
+									And(var_symbol("c",i,x_i,a),var_symbol("c",i,y_i,a))))
+					left.append(var_symbol("p",i,x_i,y_i,a))
+				part1 = And(part1)
+				left = Or(left)
+				set_6.append(And(part1,Iff(left,var_symbol("e",i,x_i,y_i))))
+				part1 = []
+				left = []
+set_6 = And(set_6)
+print(set_6)
 
 # Combine formulas
 # TODO

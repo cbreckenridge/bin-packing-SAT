@@ -66,7 +66,6 @@ for x_i in range(1,n+1):
 		set_1.append(Or([var_symbol("c",i,x_i,j) for j in range(1,n+1)]))
 
 set_1 = And(set_1)
-print(set_1)
 
 # Set 2: Consecutive linear ordering
 # for x in O, 1 <= i <= d, 1 <= a < b-1 < n
@@ -80,7 +79,6 @@ for x_i in range(1,n+1):
 				set_2.append(Implies(And(var_symbol("c",i,x_i,a), var_symbol("c",i,x_i,b)),
 										var_symbol("c",i,x_i,a+1)))
 set_2 = And(set_2)
-print(set_2)
 
 # Set 3: No-overlap constraint
 # for x,y in O
@@ -93,7 +91,6 @@ for x_i in range(1,n+1):
 			for i in range(1,d+1):
 				set_3.append(Not(var_symbol("e",i,x_i,y_i)))
 set_3 = Or(set_3)
-print(set_3)
 
 # Set 4: Stable set feasibility
 # for 1 <= i <= d, N in S^i
@@ -106,7 +103,7 @@ for i in range(1,d+1):
 		for y_i,y in enumerate(O):
 			if y_i != x_i and x[i-1] + y[i-1] > C[i-1]:
 				S[i-1].append([x_i+1,y_i+1])
-print(S)
+
 set_4 = []
 if S:
 	for i in range(1,d+1):
@@ -114,8 +111,6 @@ if S:
 			for N in S[i-1]:
 				set_4.append(var_symbol("e",i,N[0],N[1]))
 set_4 = Or(set_4)
-print(set_4)
-
 
 
 # Set 5: No empty cliques
@@ -129,7 +124,6 @@ for i in range(1,d+1):
 		right = [Not(var_symbol("c",i,x_i,a+1)) for x_i in range(1,n+1)]
 		set_5.append(Implies(And(left),And(right)))
 set_5 = And(set_5)
-print(set_5)
 
 # Set 6: Correlations between vars
 # for x,y in O, 1 <= a <= n, 1 <= i <= d
@@ -152,7 +146,6 @@ for x_i in range(1,n+1):
 				part1 = []
 				left = []
 set_6 = And(set_6)
-print(set_6)
 
 # Combine formulas
 sat_formula = And([set_1,set_2,set_3,set_4,set_5,set_6])

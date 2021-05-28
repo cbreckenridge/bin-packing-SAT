@@ -121,7 +121,15 @@ print(set_4)
 # Set 5: No empty cliques
 # 1 <= i <= d, 1 <= a <= n
 # (!c_i_1_a and ... and !c_i_n_a) implies (!c_i_1_(a+1) and ... and !c_i_n_(a+1))
-# TODO
+
+set_5 = []
+for i in range(1,d+1):
+	for a in range(1,n):
+		left = [Not(var_symbol("c",i,x_i,a)) for x_i in range(1,n+1)]
+		right = [Not(var_symbol("c",i,x_i,a+1)) for x_i in range(1,n+1)]
+		set_5.append(Implies(And(left),And(right)))
+set_5 = And(set_5)
+print(set_5)
 
 # Set 6: Correlations between vars
 # for x,y in O, 1 <= a <= n, 1 <= i <= d

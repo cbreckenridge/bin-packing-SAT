@@ -56,103 +56,107 @@ def var_symbol(*vargs):
 	except Exception as e:
 		raise e
 
-# Set 1: All objects are packed
-# for x in O, 1 <= i <= d
-# c_i_x_1 or ... or c_i_x_n
+def main():
+	# Set 1: All objects are packed
+	# for x in O, 1 <= i <= d
+	# c_i_x_1 or ... or c_i_x_n
 
-set_1 = []
-for x_i in range(1,n+1):
+	set_1 = []
+	for x_i in range(1,n+1):
+		for i in range(1,d+1):
+			set_1.append(Or([var_symbol("c",i,x_i,j) for j in range(1,n+1)]))
+
+	set_1 = And(set_1)
+
+	# Set 2: Consecutive linear ordering
+	# for x in O, 1 <= i <= d, 1 <= a < b-1 < n
+	# (c_i_x_a and c_i_x_b) implies c_i_x_(a+1)
+
+	set_2 = []
+	for x_i in range(1,n+1):
+		for i in range(1,d+1):
+			for a in range(1,n):
+				for b in range(a+2,n+1):
+					set_2.append(Implies(And(var_symbol("c",i,x_i,a), var_symbol("c",i,x_i,b)),
+											var_symbol("c",i,x_i,a+1)))
+	set_2 = And(set_2)
+
+	# Set 3: No-overlap constraint
+	# for x,y in O
+	# !e_1_x_y or ... or !e_d_x_y
+
+	set_3 = []
+	for x_i in range(1,n+1):
+		for y_i in range(1,n+1):
+			if y_i != x_i:
+				for i in range(1,d+1):
+					set_3.append(Not(var_symbol("e",i,x_i,y_i)))
+	set_3 = Or(set_3)
+
+	# Set 4: Stable set feasibility
+	# for 1 <= i <= d, N in S^i
+	# OR_(for all x,y in N) e_i_x_y
+	# Must generate all infeasible sets
+	S = []
 	for i in range(1,d+1):
-		set_1.append(Or([var_symbol("c",i,x_i,j) for j in range(1,n+1)]))
+		S.append([])
+		for x_i,x in enumerate(O):
+			for y_i,y in enumerate(O):
+				if y_i != x_i and x[i-1] + y[i-1] > C[i-1]:
+					S[i-1].append([x_i+1,y_i+1])
 
-set_1 = And(set_1)
+	set_4 = []
+	if S:
+		for i in range(1,d+1):
+			if S[i-1]:
+				for N in S[i-1]:
+					set_4.append(var_symbol("e",i,N[0],N[1]))
+	set_4 = Or(set_4)
 
-# Set 2: Consecutive linear ordering
-# for x in O, 1 <= i <= d, 1 <= a < b-1 < n
-# (c_i_x_a and c_i_x_b) implies c_i_x_(a+1)
 
-set_2 = []
-for x_i in range(1,n+1):
+	# Set 5: No empty cliques
+	# 1 <= i <= d, 1 <= a <= n
+	# (!c_i_1_a and ... and !c_i_n_a) implies (!c_i_1_(a+1) and ... and !c_i_n_(a+1))
+
+	set_5 = []
 	for i in range(1,d+1):
 		for a in range(1,n):
-			for b in range(a+2,n+1):
-				set_2.append(Implies(And(var_symbol("c",i,x_i,a), var_symbol("c",i,x_i,b)),
-										var_symbol("c",i,x_i,a+1)))
-set_2 = And(set_2)
+			left = [Not(var_symbol("c",i,x_i,a)) for x_i in range(1,n+1)]
+			right = [Not(var_symbol("c",i,x_i,a+1)) for x_i in range(1,n+1)]
+			set_5.append(Implies(And(left),And(right)))
+	set_5 = And(set_5)
 
-# Set 3: No-overlap constraint
-# for x,y in O
-# !e_1_x_y or ... or !e_d_x_y
+	# Set 6: Correlations between vars
+	# for x,y in O, 1 <= a <= n, 1 <= i <= d
+	# p_i_x_y_a iff (c_i_x_a and c_i_y_a) and (p_i_x_y_1 or ... or p_i_x_y_k) iff e_i_x_y
 
-set_3 = []
-for x_i in range(1,n+1):
-	for y_i in range(1,n+1):
-		if y_i != x_i:
-			for i in range(1,d+1):
-				set_3.append(Not(var_symbol("e",i,x_i,y_i)))
-set_3 = Or(set_3)
+	set_6 = []
+	part1 = []
+	left = []
+	for x_i in range(1,n+1):
+		for y_i in range(1,n+1):
+			if y_i != x_i:
+				for i in range(1,d+1):
+					for a in range(1,n+1):
+						part1.append(Iff(var_symbol("p",i,x_i,y_i,a),
+										And(var_symbol("c",i,x_i,a),var_symbol("c",i,y_i,a))))
+						left.append(var_symbol("p",i,x_i,y_i,a))
+					part1 = And(part1)
+					left = Or(left)
+					set_6.append(And(part1,Iff(left,var_symbol("e",i,x_i,y_i))))
+					part1 = []
+					left = []
+	set_6 = And(set_6)
 
-# Set 4: Stable set feasibility
-# for 1 <= i <= d, N in S^i
-# OR_(for all x,y in N) e_i_x_y
-# Must generate all infeasible sets
-S = []
-for i in range(1,d+1):
-	S.append([])
-	for x_i,x in enumerate(O):
-		for y_i,y in enumerate(O):
-			if y_i != x_i and x[i-1] + y[i-1] > C[i-1]:
-				S[i-1].append([x_i+1,y_i+1])
+	# Combine formulas
+	sat_formula = And([set_1,set_2,set_3,set_4,set_5,set_6])
 
-set_4 = []
-if S:
-	for i in range(1,d+1):
-		if S[i-1]:
-			for N in S[i-1]:
-				set_4.append(var_symbol("e",i,N[0],N[1]))
-set_4 = Or(set_4)
+	# Get sat assignment if possible
+	model = get_model(sat_formula)
+	if model:
+	  	print(model)
+	else:
+	  	print("No solution found")
 
-
-# Set 5: No empty cliques
-# 1 <= i <= d, 1 <= a <= n
-# (!c_i_1_a and ... and !c_i_n_a) implies (!c_i_1_(a+1) and ... and !c_i_n_(a+1))
-
-set_5 = []
-for i in range(1,d+1):
-	for a in range(1,n):
-		left = [Not(var_symbol("c",i,x_i,a)) for x_i in range(1,n+1)]
-		right = [Not(var_symbol("c",i,x_i,a+1)) for x_i in range(1,n+1)]
-		set_5.append(Implies(And(left),And(right)))
-set_5 = And(set_5)
-
-# Set 6: Correlations between vars
-# for x,y in O, 1 <= a <= n, 1 <= i <= d
-# p_i_x_y_a iff (c_i_x_a and c_i_y_a) and (p_i_x_y_1 or ... or p_i_x_y_k) iff e_i_x_y
-
-set_6 = []
-part1 = []
-left = []
-for x_i in range(1,n+1):
-	for y_i in range(1,n+1):
-		if y_i != x_i:
-			for i in range(1,d+1):
-				for a in range(1,n+1):
-					part1.append(Iff(var_symbol("p",i,x_i,y_i,a),
-									And(var_symbol("c",i,x_i,a),var_symbol("c",i,y_i,a))))
-					left.append(var_symbol("p",i,x_i,y_i,a))
-				part1 = And(part1)
-				left = Or(left)
-				set_6.append(And(part1,Iff(left,var_symbol("e",i,x_i,y_i))))
-				part1 = []
-				left = []
-set_6 = And(set_6)
-
-# Combine formulas
-sat_formula = And([set_1,set_2,set_3,set_4,set_5,set_6])
-
-# Get sat assignment if possible
-model = get_model(sat_formula)
-if model:
-  	print(model)
-else:
-  	print("No solution found")
+if __name__ == '__main__':
+	main()

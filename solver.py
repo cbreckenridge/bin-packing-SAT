@@ -2,6 +2,7 @@
 # Christine Breckenridge
 
 import sys
+from time import perf_counter
 from pysmt.shortcuts import Symbol, And, Or, Solver, Iff, Implies, Not, get_model, get_formula_size
 
 # Variables:
@@ -151,11 +152,14 @@ def main():
 
 	# Combine formulas
 	sat_formula = And([set_1,set_2,set_3,set_4,set_5,set_6])
-	size = get_formula_size(sat_formula)
-	print(f"Size of SAT formula: {size}")
+	size = len(sat_formula.get_atoms())
+	print(f"Number of variables: {size}")
 
 	# Get sat assignment if possible
+	start = perf_counter()
 	model = get_model(sat_formula)
+	end = perf_counter()
+	print(f"Solved in {end-start} seconds")
 	if model:
 		print("Satisfying assignment found")
 		print("____________________________")

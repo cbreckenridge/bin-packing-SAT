@@ -2,7 +2,7 @@
 # Christine Breckenridge
 
 import sys
-from pysmt.shortcuts import Symbol, And, Or, Solver, Iff, Implies, Not, get_model
+from pysmt.shortcuts import Symbol, And, Or, Solver, Iff, Implies, Not, get_model, get_formula_size
 
 # Variables:
 # e_i_x_y = true if edge x,y in G_i
@@ -151,11 +151,14 @@ def main():
 
 	# Combine formulas
 	sat_formula = And([set_1,set_2,set_3,set_4,set_5,set_6])
+	size = get_formula_size(sat_formula)
+	print(f"Size of SAT formula: {size}")
 
 	# Get sat assignment if possible
 	model = get_model(sat_formula)
 	if model:
 		print("Satisfying assignment found")
+		print("____________________________")
 	  	# print(model)
 	else:
 	  	print("No solution found")
@@ -171,18 +174,19 @@ if __name__ == '__main__':
 		d = 2
 		for l in lines:
 			if n and len(O) == n:
-				break
+				print(f"{n} items")
+				print(f"Container size: {C}")
+				print(f"Items: {O}")
+				main()
+				O = []
+				n = 0
 			elif "N. OF ITEMS" in l:
 				n = int(l.split()[0])
 			elif "HBIN,WBIN" in l:
 				C = (int(l.split()[0]),int(l.split()[1]))
 			elif "H(I),W(I),I=1,...,N" in l:
 				O.append((int(l.split()[0]),int(l.split()[1])))
-				print(len(O))
 			elif n:
 				O.append((int(l.split()[0]),int(l.split()[1])))
 			
-		print(n)
-		print(C)
-		print(O)
-		main()
+		

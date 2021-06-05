@@ -59,6 +59,7 @@ def var_symbol(*vargs):
 		raise e
 
 def main():
+	print("Creating SAT formula...")
 	# Set 1: All objects are packed
 	# for x in O, 1 <= i <= d
 	# c_i_x_1 or ... or c_i_x_n
@@ -88,12 +89,16 @@ def main():
 	# !e_1_x_y or ... or !e_d_x_y
 
 	set_3 = []
+	pair = []
 	for x_i in range(1,n+1):
 		for y_i in range(1,n+1):
 			if y_i != x_i:
 				for i in range(1,d+1):
-					set_3.append(Not(var_symbol("e",i,x_i,y_i)))
-	set_3 = Or(set_3)
+					pair.append(Not(var_symbol("e",i,x_i,y_i)))
+				set_3.append(Or(pair))
+				pair = []
+	set_3 = And(set_3)
+	# print(set_3)
 
 	# Set 4: Stable set feasibility
 	# for 1 <= i <= d, N in S^i
@@ -113,7 +118,7 @@ def main():
 			if S[i-1]:
 				for N in S[i-1]:
 					set_4.append(var_symbol("e",i,N[0],N[1]))
-	set_4 = Or(set_4)
+	set_4 = And(set_4)
 
 
 	# Set 5: No empty cliques
@@ -163,28 +168,23 @@ def main():
 	if model:
 		print("Satisfying assignment found")
 		print("____________________________")
-	  	# print(model)
+		print(model)
 	else:
 	  	print("No solution found")
 
 if __name__ == '__main__':
 	if len(sys.argv) == 2:
 		filepath = sys.argv[1]
+		print("Reading file...")
 		f = open(filepath,'r')
 
 		lines = f.readlines()
+		
 		O = []
 		n = 0
 		d = 2
 		for l in lines:
-			if n and len(O) == n:
-				print(f"{n} items")
-				print(f"Container size: {C}")
-				print(f"Items: {O}")
-				main()
-				O = []
-				n = 0
-			elif "N. OF ITEMS" in l:
+			if "N. OF ITEMS" in l:
 				n = int(l.split()[0])
 			elif "HBIN,WBIN" in l:
 				C = (int(l.split()[0]),int(l.split()[1]))
@@ -192,5 +192,11 @@ if __name__ == '__main__':
 				O.append((int(l.split()[0]),int(l.split()[1])))
 			elif n:
 				O.append((int(l.split()[0]),int(l.split()[1])))
-			
+			if n and len(O) == n:
+				print(f"{n} items")
+				print(f"Container size: {C}")
+				print(f"Items: {O}")
+				main()
+				O = []
+				n = 0
 		

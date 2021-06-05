@@ -117,7 +117,7 @@ def main():
 		for i in range(1,d+1):
 			if S[i-1]:
 				for N in S[i-1]:
-					set_4.append(var_symbol("e",i,N[0],N[1]))
+					set_4.append(Or(var_symbol("e",i,N[0],N[1]),var_symbol("e",i,N[1],N[0])))
 	set_4 = And(set_4)
 
 

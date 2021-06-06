@@ -4,6 +4,7 @@
 import sys
 from time import perf_counter
 from pysmt.shortcuts import Symbol, And, Or, Solver, Iff, Implies, Not, get_model, get_formula_size
+from itertools import combinations
 
 # Variables:
 # e_i_x_y = true if edge x,y in G_i
@@ -104,20 +105,29 @@ def main():
 	# for 1 <= i <= d, N in S^i
 	# OR_(for all x,y in N) e_i_x_y
 	# Must generate all infeasible sets
+
 	S = []
 	for i in range(1,d+1):
 		S.append([])
-		for x_i,x in enumerate(O):
-			for y_i,y in enumerate(O):
-				if y_i != x_i and x[i-1] + y[i-1] > C[i-1]:
-					S[i-1].append([x_i+1,y_i+1])
+		for size in range(2,n+1):
+			for N in combinations(set(range(1,n+1)),size):
+				if any(S_set and S_set.issubset(N) for S_set in S[i-1]): #already have min set
+					continue
+				elif sum(O[x-1][i-1] for x in N) > C[i-1]: #too big for container
+					S[i-1].append(set(N))
+
 
 	set_4 = []
+	subset = []
 	if S:
 		for i in range(1,d+1):
 			if S[i-1]:
 				for N in S[i-1]:
-					set_4.append(Or(var_symbol("e",i,N[0],N[1]),var_symbol("e",i,N[1],N[0])))
+					for x_i,y_i in combinations(N,2):
+						subset.append(var_symbol("e",i,x_i,y_i))
+						subset.append(var_symbol("e",i,y_i,x_i))
+					set_4.append(Or(subset))
+					subset = []
 	set_4 = And(set_4)
 
 

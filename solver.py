@@ -59,7 +59,12 @@ def var_symbol(*vargs):
 	except Exception as e:
 		raise e
 
-def main():
+
+def main(C,O,printing=False):
+
+	n = len(O)
+	d = len(O[0])
+
 	print("Creating SAT formula...")
 	# Set 1: All objects are packed
 	# for x in O, 1 <= i <= d
@@ -177,10 +182,10 @@ def main():
 	print(f"Solved in {end-start} seconds")
 	if model:
 		print("Satisfying assignment found")
-		print("____________________________")
-		print(model)
+		if printing: print(model)
 	else:
 	  	print("No solution found")
+	print("____________________________")
 
 if __name__ == '__main__':
 	if len(sys.argv) == 2:
@@ -206,7 +211,7 @@ if __name__ == '__main__':
 				print(f"{n} items")
 				print(f"Container size: {C}")
 				print(f"Items: {O}")
-				main()
+				main(C,O)
 				O = []
 				n = 0
 		

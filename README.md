@@ -2,6 +2,7 @@
 
 To run:
 pip install -r requirements.txt
+pysmt-install --z3
 python3 solver.py <filepath> <options>
 
 You must specify a filepath to the problem instance. Examples can be found in the problems folder.

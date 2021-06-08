@@ -5,6 +5,7 @@ import sys
 from time import perf_counter
 from pysmt.shortcuts import Symbol, And, Or, Solver, Iff, Implies, Not, get_model, get_formula_size
 from itertools import combinations
+import plot_graph
 
 # Variables:
 # e_i_x_y = true if edge x,y in G_i
@@ -60,12 +61,14 @@ def var_symbol(*vargs):
 		raise e
 
 
-def main(C,O,printing=False):
+def main(C,O,printing=False,graphing=False):
 
 	n = len(O)
 	d = len(O[0])
 
 	print("Creating SAT formula...")
+	start = perf_counter() # start timer
+
 	# Set 1: All objects are packed
 	# for x in O, 1 <= i <= d
 	# c_i_x_1 or ... or c_i_x_n
@@ -172,24 +175,38 @@ def main(C,O,printing=False):
 
 	# Combine formulas
 	sat_formula = And([set_1,set_2,set_3,set_4,set_5,set_6])
-	size = len(sat_formula.get_atoms())
-	print(f"Number of variables: {size}")
+	var_num = len(sat_formula.get_atoms())
+	size = sat_formula.size()
+	print(f"Number of variables: {var_num}")
+	print(f"Size of formula: {size}")
 
 	# Get sat assignment if possible
-	start = perf_counter()
+	
 	model = get_model(sat_formula)
 	end = perf_counter()
 	print(f"Solved in {end-start} seconds")
 	if model:
 		print("Satisfying assignment found")
 		if printing: print(model)
+		if graphing: plot_graph.main(C,O,model)
 	else:
 	  	print("No solution found")
 	print("____________________________")
 
 if __name__ == '__main__':
-	if len(sys.argv) == 2:
-		filepath = sys.argv[1]
+	opts = [opt for opt in sys.argv[1:] if opt.startswith("-")]
+	args = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
+
+	printing = False
+	graphing = False
+
+	if '-p' in opts:
+		printing = True
+	if '-g' in opts:
+		graphing = True
+
+	if len(args) >= 1:
+		filepath = args[0]
 		print("Reading file...")
 		f = open(filepath,'r')
 
@@ -211,7 +228,8 @@ if __name__ == '__main__':
 				print(f"{n} items")
 				print(f"Container size: {C}")
 				print(f"Items: {O}")
-				main(C,O,printing=True)
+				main(C,O,printing=printing,graphing=graphing)
 				O = []
 				n = 0
-		
+	else:
+		print("Please specify filepath")

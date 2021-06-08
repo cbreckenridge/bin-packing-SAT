@@ -98,7 +98,6 @@ def main(C,O,printing=False):
 	pair = []
 	for x_i in range(1,n+1):
 		for y_i in range(x_i+1,n+1):
-			# if y_i != x_i:
 			for i in range(1,d+1):
 				pair.append(Not(var_symbol("e",i,x_i,y_i)))
 			set_3.append(Or(pair))
@@ -159,7 +158,6 @@ def main(C,O,printing=False):
 	left = []
 	for x_i in range(1,n+1):
 		for y_i in range(x_i+1,n+1):
-			# if y_i != x_i:
 			for i in range(1,d+1):
 				for a in range(1,n+1):
 					part1.append(Iff(var_symbol("p",i,x_i,y_i,a),

@@ -97,12 +97,12 @@ def main(C,O,printing=False):
 	set_3 = []
 	pair = []
 	for x_i in range(1,n+1):
-		for y_i in range(1,n+1):
-			if y_i != x_i:
-				for i in range(1,d+1):
-					pair.append(Not(var_symbol("e",i,x_i,y_i)))
-				set_3.append(Or(pair))
-				pair = []
+		for y_i in range(x_i+1,n+1):
+			# if y_i != x_i:
+			for i in range(1,d+1):
+				pair.append(Not(var_symbol("e",i,x_i,y_i)))
+			set_3.append(Or(pair))
+			pair = []
 	set_3 = And(set_3)
 	# print(set_3)
 
@@ -129,8 +129,10 @@ def main(C,O,printing=False):
 			if S[i-1]:
 				for N in S[i-1]:
 					for x_i,y_i in combinations(N,2):
-						subset.append(var_symbol("e",i,x_i,y_i))
-						subset.append(var_symbol("e",i,y_i,x_i))
+						if x_i < y_i:
+							subset.append(var_symbol("e",i,x_i,y_i))
+						else:
+							subset.append(var_symbol("e",i,y_i,x_i))
 					set_4.append(Or(subset))
 					subset = []
 	set_4 = And(set_4)
@@ -156,18 +158,18 @@ def main(C,O,printing=False):
 	part1 = []
 	left = []
 	for x_i in range(1,n+1):
-		for y_i in range(1,n+1):
-			if y_i != x_i:
-				for i in range(1,d+1):
-					for a in range(1,n+1):
-						part1.append(Iff(var_symbol("p",i,x_i,y_i,a),
-										And(var_symbol("c",i,x_i,a),var_symbol("c",i,y_i,a))))
-						left.append(var_symbol("p",i,x_i,y_i,a))
-					part1 = And(part1)
-					left = Or(left)
-					set_6.append(And(part1,Iff(left,var_symbol("e",i,x_i,y_i))))
-					part1 = []
-					left = []
+		for y_i in range(x_i+1,n+1):
+			# if y_i != x_i:
+			for i in range(1,d+1):
+				for a in range(1,n+1):
+					part1.append(Iff(var_symbol("p",i,x_i,y_i,a),
+									And(var_symbol("c",i,x_i,a),var_symbol("c",i,y_i,a))))
+					left.append(var_symbol("p",i,x_i,y_i,a))
+				part1 = And(part1)
+				left = Or(left)
+				set_6.append(And(part1,Iff(left,var_symbol("e",i,x_i,y_i))))
+				part1 = []
+				left = []
 	set_6 = And(set_6)
 
 	# Combine formulas
@@ -205,13 +207,13 @@ if __name__ == '__main__':
 				C = (int(l.split()[0]),int(l.split()[1]))
 			elif "H(I),W(I),I=1,...,N" in l:
 				O.append((int(l.split()[0]),int(l.split()[1])))
-			elif n:
+			elif n and "RELATIVE AND ABSOLUTE N. OF INSTANCE" not in l:
 				O.append((int(l.split()[0]),int(l.split()[1])))
 			if n and len(O) == n:
 				print(f"{n} items")
 				print(f"Container size: {C}")
 				print(f"Items: {O}")
-				main(C,O)
+				main(C,O,printing=True)
 				O = []
 				n = 0
 		

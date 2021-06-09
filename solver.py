@@ -184,16 +184,16 @@ if __name__ == '__main__':
 		
 		O = []
 		n = 0
-		d = 2
+
 		for l in lines:
 			if "N. OF ITEMS" in l:
 				n = int(l.split()[0])
 			elif "HBIN,WBIN" in l:
-				C = (int(l.split()[0]),int(l.split()[1]))
+				C = tuple(int(w) for w in l.split()[:-1])
 			elif "H(I),W(I),I=1,...,N" in l:
-				O.append((int(l.split()[0]),int(l.split()[1])))
+				O.append(tuple(int(w) for w in l.split()[:-1]))
 			elif n and "RELATIVE AND ABSOLUTE N. OF INSTANCE" not in l:
-				O.append((int(l.split()[0]),int(l.split()[1])))
+				O.append(tuple(int(w) for w in l.split()))
 			if n and len(O) == n:
 				print(f"{n} items")
 				print(f"Container size: {C}")

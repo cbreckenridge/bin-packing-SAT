@@ -146,9 +146,9 @@ def main(C,O,printing=False,graphing=False):
 	# Combine formulas
 	sat_formula = And([set_1,set_2,set_3,set_4,set_5])
 	var_num = len(sat_formula.get_atoms())
-	# size = sat_formula.size()
+	size = sat_formula.size()
 	print(f"Number of variables: {var_num}")
-	# print(f"Size of formula: {size}")
+	print(f"Size of formula: {size}")
 
 	# Get sat assignment if possible
 	

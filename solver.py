@@ -18,15 +18,6 @@ import plot_graph
 # S^i = set of all infeasible sets in dim i
 # C = container
 
-# Simple example for testing
-x1 = (1,2)
-x2 = (3,1)
-x3 = (2,1)
-O = (x1,x2,x3)
-C = (4,6)
-n = len(O)
-d = len(x1)
-
 
 
 def var_string(*vargs):

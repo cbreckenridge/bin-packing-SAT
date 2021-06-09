@@ -1,4 +1,4 @@
-# Main file for getting satisfiable assignment of bin packing instance
+# Main file for getting satisfiable assignment of orthogonal packing instance
 # Christine Breckenridge
 
 import sys
@@ -11,7 +11,6 @@ import plot_graph
 # e_i_x_y = true if edge x,y in G_i
 # c_i_x_a = true if item x is in clique a
 # p_i_x_y_a = true if items x & y are both in clique a
-# u_i_a = true if clique a is not empty
 
 # d = dimension
 # n = # of cliques

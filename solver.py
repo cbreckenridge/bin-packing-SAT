@@ -60,12 +60,6 @@ def var_symbol(*vargs):
 	except Exception as e:
 		raise e
 
-def possible_infeasible(O,C,i,k):
-	i_sizes = [x[i-1] for x in O]
-	i_sizes.sort()
-	max_sum = sum(i_sizes[:k])
-	return max_sum > C[i-1]
-
 
 def main(C,O,printing=False,graphing=False):
 
@@ -124,7 +118,6 @@ def main(C,O,printing=False,graphing=False):
 	for i in range(1,d+1):
 		S.append([])
 		for size in range(2,n+1):
-			# if possible_infeasible(O,C,i,size): #only check combinations if infeasible sets exist
 			for N in combinations(item_indexes,size):
 				if any(S_set and S_set.issubset(N) for S_set in S[i-1]): #already have min set
 					continue
